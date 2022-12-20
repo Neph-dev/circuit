@@ -1,0 +1,107 @@
+type Operator @model {
+  id: ID!
+  operatorName: String!
+  operatorOfficialLogo: String!
+  cityOperating: [String]
+  sectors: [Sector] @connection(keyName: "byOperator", fields: ["id"])
+}
+
+type Sector @model
+  @key(name: "byOperator", fields: ["operatorID", "sectorName"]) {
+  id: ID!
+  sectorName: String
+  operatorID: ID!
+  operator: Operator @connection(fields: ["operatorID"])
+  routes: [Route] @connection(keyName: "bySector", fields: ["id"])
+}
+
+# Route Models
+# Each station is considered as a check point,
+# containing all information about ETA and bus numbers. 
+# We place all stations of the same line in an array of checkpoints
+# with starting and ending coordinates.
+type Route @model
+  @key(name: "bySector", fields: ["sectorID", "sectorName"]) {
+  id: ID!
+  sectorID: ID!
+  sectorName: String
+  sector: Sector @connection(fields: ["sectorID"]),
+  routeCheckPoints: [RouteCheckPoint] @connection(keyName: "byRoute", fields: ["id"])
+}
+type RouteCheckPoint @model 
+  @key(name: "byRoute", fields: [
+      "routeID"
+      "checkPointLatitude" 
+      "checkPointLongitude" 
+      "checkPointName"
+      "checkPointDay"
+    ]){
+  id: ID!
+  checkPointLatitude: String
+  checkPointLongitude: String
+  checkPointName: String
+  checkPointDay: [String]
+  routeID: ID!
+  route: Route @connection(fields: ["routeID"])
+  checkPointDetails: [CheckPointDetails] @connection(keyName: "byRouteCheckPoint", fields: ["id"])
+}
+type CheckPointDetails @model 
+  @key(name:"byRouteCheckPoint", fields: [
+      "routeCheckPointID"
+      "checkPointDepartureTime"
+      "checkPointBusNumber"
+      "checkPointCount"
+    ]) {
+  checkPointDepartureTime: String
+  checkPointBusNumber: String
+  checkPointCount: Int
+  routeCheckPointID: ID!
+  routeCheckPoint: RouteCheckPoint @connection(fields: ["routeCheckPointID"])
+}
+
+type TagsInfo @model {
+  id: ID!
+  numberOfTags: Int
+  durationToExpiryInDays: Int
+  price: String
+  operatorID: ID!
+  sectorsValidity: [String!]
+}
+
+# Every models that will depend on the user
+type userDefaultOperator 
+  @model
+  @auth(rules: [{allow: owner, operations: [read, create, delete, update]}] ) {
+  id: ID!
+  name: String!
+  operatorID: ID!
+}
+type userSettings 
+  @model
+  @auth(rules: [{allow: owner, operations: [read, create, delete, update]}] ) {
+  id: ID!
+  totalPointsEarned: Int!
+  totalTrips: Int!
+  userCategory: String!
+}
+type UserTags
+  @model
+  @auth(rules: [{allow: owner, operations: [read, create, delete, update]}]) {
+  id: ID!
+  numberOfTags: Int
+  expiryDate: String
+  expiryTime: String
+  operatorID: ID!
+  sectorID: ID!
+}
+
+type UserScanHistory
+  @model
+  @auth(rules: [{allow: owner, operations: [read, create, delete]}]) {
+  id: ID!,
+  dateScanned: String!,
+  timeScanned: String!,
+  idScanned: ID!,
+  status: String!,
+  numberOfTagsDebited: Int!,
+}
