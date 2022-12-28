@@ -21,8 +21,10 @@ type Sector @model
 # We place all stations of the same line in an array of checkpoints
 # with starting and ending coordinates.
 type Route @model
-  @key(name: "bySector", fields: ["sectorID", "sectorName"]) {
+  @key(name: "bySector", fields: ["sectorID", "sectorName", "routeName", "lineNumber"]) {
   id: ID!
+  routeName: String
+  lineNumber: String
   sectorID: ID!
   sectorName: String
   sector: Sector @connection(fields: ["sectorID"]),
@@ -49,11 +51,9 @@ type CheckPointDetails @model
   @key(name:"byRouteCheckPoint", fields: [
       "routeCheckPointID"
       "checkPointDepartureTime"
-      "checkPointBusNumber"
       "checkPointCount"
     ]) {
   checkPointDepartureTime: String
-  checkPointBusNumber: String
   checkPointCount: Int
   routeCheckPointID: ID!
   routeCheckPoint: RouteCheckPoint @connection(fields: ["routeCheckPointID"])

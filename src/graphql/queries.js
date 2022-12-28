@@ -65,6 +65,8 @@ export const getSector = /* GraphQL */ `
       routes {
         items {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -110,6 +112,8 @@ export const getRoute = /* GraphQL */ `
   query GetRoute($id: ID!) {
     getRoute(id: $id) {
       id
+      routeName
+      lineNumber
       sectorID
       sectorName
       sector {
@@ -157,6 +161,8 @@ export const listRoutes = /* GraphQL */ `
     listRoutes(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -187,6 +193,8 @@ export const getRouteCheckPoint = /* GraphQL */ `
       routeID
       route {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -206,7 +214,6 @@ export const getRouteCheckPoint = /* GraphQL */ `
         items {
           id
           checkPointDepartureTime
-          checkPointBusNumber
           checkPointCount
           routeCheckPointID
           createdAt
@@ -239,6 +246,8 @@ export const listRouteCheckPoints = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -259,7 +268,6 @@ export const getCheckPointDetails = /* GraphQL */ `
     getCheckPointDetails(id: $id) {
       id
       checkPointDepartureTime
-      checkPointBusNumber
       checkPointCount
       routeCheckPointID
       routeCheckPoint {
@@ -271,6 +279,8 @@ export const getCheckPointDetails = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -301,7 +311,6 @@ export const listCheckPointDetailss = /* GraphQL */ `
       items {
         id
         checkPointDepartureTime
-        checkPointBusNumber
         checkPointCount
         routeCheckPointID
         routeCheckPoint {

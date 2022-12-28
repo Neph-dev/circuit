@@ -39,6 +39,11 @@ export default function SearchRoute() {
     // call function only if user search a route
     const [searching, setSearching] = useState(false)
 
+    const [depCheckPointCount, setDepCheckPointCount] = useState()
+    const [arrCheckPointCount, setArrCheckPointCount] = useState()
+    const [depFindRouteDetails, setDepFindRouteDetails] = useState()
+    const [arrFindRouteDetails, setArrFindRouteDetails] = useState()
+
     const [selectedDay, setSelectedDay] = useState(currentDay)
 
     let minDistanceDep
@@ -81,11 +86,6 @@ export default function SearchRoute() {
         })
     }
 
-    const [depCheckPointCount, setDepCheckPointCount] = useState()
-    const [arrCheckPointCount, setArrCheckPointCount] = useState()
-    const [depFindRouteDetails, setDepFindRouteDetails] = useState()
-    const [arrFindRouteDetails, setArrFindRouteDetails] = useState()
-
     const filterToDepFindRouteDetails = () => checkPointDetails.filter(element => {
         if (element.routeCheckPointID?.includes(getMinDistanceDep?.id) && depCheckPointCount === undefined) {
             setDepFindRouteDetails(element)
@@ -111,7 +111,9 @@ export default function SearchRoute() {
                 setDistances={setDistances}
                 setSearching={setSearching}
                 setLatitude1={setLatitude1}
-                setLongitude1={setLongitude1} />
+                setLongitude1={setLongitude1}
+                setDepFindRouteDetails={setDepFindRouteDetails}
+                setArrFindRouteDetails={setArrFindRouteDetails} />
 
             {(depFindRouteDetails !== undefined && arrFindRouteDetails !== undefined) &&
                 <>

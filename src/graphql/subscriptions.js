@@ -87,6 +87,8 @@ export const onCreateSector = /* GraphQL */ `
       routes {
         items {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -119,6 +121,8 @@ export const onUpdateSector = /* GraphQL */ `
       routes {
         items {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -151,6 +155,8 @@ export const onDeleteSector = /* GraphQL */ `
       routes {
         items {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -167,6 +173,8 @@ export const onCreateRoute = /* GraphQL */ `
   subscription OnCreateRoute {
     onCreateRoute {
       id
+      routeName
+      lineNumber
       sectorID
       sectorName
       sector {
@@ -209,6 +217,8 @@ export const onUpdateRoute = /* GraphQL */ `
   subscription OnUpdateRoute {
     onUpdateRoute {
       id
+      routeName
+      lineNumber
       sectorID
       sectorName
       sector {
@@ -251,6 +261,8 @@ export const onDeleteRoute = /* GraphQL */ `
   subscription OnDeleteRoute {
     onDeleteRoute {
       id
+      routeName
+      lineNumber
       sectorID
       sectorName
       sector {
@@ -300,6 +312,8 @@ export const onCreateRouteCheckPoint = /* GraphQL */ `
       routeID
       route {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -319,7 +333,6 @@ export const onCreateRouteCheckPoint = /* GraphQL */ `
         items {
           id
           checkPointDepartureTime
-          checkPointBusNumber
           checkPointCount
           routeCheckPointID
           createdAt
@@ -343,6 +356,8 @@ export const onUpdateRouteCheckPoint = /* GraphQL */ `
       routeID
       route {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -362,7 +377,6 @@ export const onUpdateRouteCheckPoint = /* GraphQL */ `
         items {
           id
           checkPointDepartureTime
-          checkPointBusNumber
           checkPointCount
           routeCheckPointID
           createdAt
@@ -386,6 +400,8 @@ export const onDeleteRouteCheckPoint = /* GraphQL */ `
       routeID
       route {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -405,7 +421,6 @@ export const onDeleteRouteCheckPoint = /* GraphQL */ `
         items {
           id
           checkPointDepartureTime
-          checkPointBusNumber
           checkPointCount
           routeCheckPointID
           createdAt
@@ -423,7 +438,6 @@ export const onCreateCheckPointDetails = /* GraphQL */ `
     onCreateCheckPointDetails {
       id
       checkPointDepartureTime
-      checkPointBusNumber
       checkPointCount
       routeCheckPointID
       routeCheckPoint {
@@ -435,6 +449,8 @@ export const onCreateCheckPointDetails = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -456,7 +472,6 @@ export const onUpdateCheckPointDetails = /* GraphQL */ `
     onUpdateCheckPointDetails {
       id
       checkPointDepartureTime
-      checkPointBusNumber
       checkPointCount
       routeCheckPointID
       routeCheckPoint {
@@ -468,6 +483,8 @@ export const onUpdateCheckPointDetails = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -489,7 +506,6 @@ export const onDeleteCheckPointDetails = /* GraphQL */ `
     onDeleteCheckPointDetails {
       id
       checkPointDepartureTime
-      checkPointBusNumber
       checkPointCount
       routeCheckPointID
       routeCheckPoint {
@@ -501,6 +517,8 @@ export const onDeleteCheckPointDetails = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
