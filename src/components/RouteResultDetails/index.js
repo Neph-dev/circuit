@@ -5,16 +5,16 @@ import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommu
 import Fontisto from 'react-native-vector-icons/dist/Fontisto'
 
 
-const RouteResultDetails = ({ ...props }) => {
+const RouteResultDetails = () => {
 
     return (
         <>
             <View>
                 <Text style={styles.boldText}>
-                    {props?.RouteResults?.checkPointDepartureTime}
+                    9:00
                 </Text>
                 <Text style={styles.boldText}>
-                    {props?.arrFindRouteDetails?.checkPointDepartureTime}
+                    9:30
                 </Text>
             </View>
 

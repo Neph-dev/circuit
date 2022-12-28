@@ -25,5 +25,4 @@ export default function DistanceCalculation(lat1, lat2, lon1, lon2) {
 
     // calculate the result
     return (c * r)
-
 }
