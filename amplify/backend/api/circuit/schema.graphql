@@ -52,9 +52,12 @@ type CheckPointDetails @model
       "routeCheckPointID"
       "checkPointDepartureTime"
       "checkPointCount"
+      "nextCheckPointDetailsID"
     ]) {
   checkPointDepartureTime: String
   checkPointCount: Int
+  checkPointNumber: Int
+  nextCheckPointDetailsID: String
   routeCheckPointID: ID!
   routeCheckPoint: RouteCheckPoint @connection(fields: ["routeCheckPointID"])
 }

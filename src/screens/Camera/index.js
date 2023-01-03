@@ -82,9 +82,15 @@ export default function Camera({ route }) {
             numberOfTagsDebited: 1,
           }
 
-          await API.graphql({ query: mutations.updateUserSettings, variables: { input: updateUserSettingsData } })
+          await API.graphql({
+            query: mutations.updateUserSettings,
+            variables: { input: updateUserSettingsData }
+          })
             .then(() => {
-              API.graphql({ query: mutations.createUserScanHistory, variables: { input: userScanHistoryDataSuccess } })
+              API.graphql({
+                query: mutations.createUserScanHistory,
+                variables: { input: userScanHistoryDataSuccess }
+              })
 
               fetchUserTags()
               fetchUserSettings()
@@ -105,7 +111,10 @@ export default function Camera({ route }) {
         status: 'failed',
         numberOfTagsDebited: 0,
       }
-      API.graphql({ query: mutations.createUserScanHistory, variables: { input: userScanHistoryDataFailed } })
+      API.graphql({
+        query: mutations.createUserScanHistory,
+        variables: { input: userScanHistoryDataFailed }
+      })
 
       setScannedQR('failed')
       navigation.navigate('ScanFailed', { operatorData })

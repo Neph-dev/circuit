@@ -6,8 +6,10 @@ import { API } from 'aws-amplify'
 import * as queries from '../../graphql/queries'
 
 import {
-    DARK_GREY_COLOR, GLOBAL_STYLES,
-    LIGHT_GREY_COLOR, PRIMARY_COLOR,
+    DARK_GREY_COLOR,
+    GLOBAL_STYLES,
+    LIGHT_GREY_COLOR,
+    PRIMARY_COLOR,
     SECONDARY_COLOR
 } from '../../styles/GlobalStyles'
 import DistanceCalculation from '../DistanceCalculation'
@@ -26,6 +28,13 @@ export default function SearchBar({ ...props }) {
         arrivalAddress,
 
         routeCheckPoint,
+        setDepartureStationResult,
+        departureStationResult,
+        setArrivalStationResult,
+        arrivalStationResult,
+
+        setMinDepartureDistance,
+        setMinArrivalDistance
     } = props
 
     const [showSearchBar, setShowSearchBar] = useState(false)
@@ -36,13 +45,14 @@ export default function SearchBar({ ...props }) {
     const [arrivalDistances, setArrivalDistances] = useState([])
     const [filteredArrivalStation, setFilteredArrivalStation] = useState([])
 
+
+
     const TextAbstract = (text, length) => {
         if (text == null) return ""
 
         if (text.length <= length) return text
 
         text = text.substring(0, length)
-        text = text.substring(0, 35)
         return text + "..."
     }
 
@@ -66,7 +76,7 @@ export default function SearchBar({ ...props }) {
             setDepartureLongitude(details.geometry.location.lng)
             setDepartureAddress(data.description)
 
-            await routeCheckPoint.filter(async (ele) => {
+            routeCheckPoint.filter(async (ele) => {
                 // * From the departing coordinates, find the nearest Station
                 const distance = DistanceCalculation(
                     details.geometry.location.lat,
@@ -80,6 +90,8 @@ export default function SearchBar({ ...props }) {
                     return element === Math.min.apply(Math, departureDistances)
                 })
                 routeCheckPoint[findIndexEle]
+
+                setMinDepartureDistance(Math.min.apply(Math, departureDistances))
 
                 await API.graphql({
                     query: queries.listRouteCheckPoints, variables: {
@@ -97,7 +109,7 @@ export default function SearchBar({ ...props }) {
             setArrivalLongitude(details.geometry.location.lng)
             setArrivalAddress(data.description)
 
-            await routeCheckPoint.filter(async (ele) => {
+            routeCheckPoint.filter(async (ele) => {
                 // * From the arrival coordinates, find the nearest Station
                 const distance = DistanceCalculation(
                     details.geometry.location.lat,
@@ -112,6 +124,8 @@ export default function SearchBar({ ...props }) {
                 })
                 routeCheckPoint[findIndexEle]
 
+                setMinArrivalDistance(Math.min.apply(Math, arrivalDistances))
+
                 await API.graphql({
                     query: queries.listRouteCheckPoints, variables: {
                         filter: {
@@ -124,26 +138,44 @@ export default function SearchBar({ ...props }) {
             })
         }
 
-        filteredDepartingStation.filter((_departingStation) => {
-            filteredArrivalStation.filter((_arrivalStation) => {
-                if (_arrivalStation.routeID === _departingStation.routeID) {
-                    API.graphql({
-                        query: queries.listCheckPointDetailss, variables: {
-                            filter: { routeCheckPointID: { eq: _departingStation.id } }
-                        }
-                    })
-                        .then((response) => console.log(response?.data?.listCheckPointDetailss?.items))
-                        .catch((error) => console.log(error))
-                    API.graphql({
-                        query: queries.listCheckPointDetailss, variables: {
-                            filter: { routeCheckPointID: { eq: _arrivalStation.id } }
-                        }
-                    })
-                        .then((response) => console.log(response?.data?.listCheckPointDetailss?.items))
-                        .catch((error) => console.log(error))
-                }
+        if (filteredArrivalStation.length > 0 && filteredDepartingStation.length > 0) {
+            filteredDepartingStation.filter((_departingStation) => {
+                filteredArrivalStation.filter((_arrivalStation) => {
+                    if (_arrivalStation.routeID === _departingStation.routeID) {
+                        API.graphql({
+                            query: queries.listCheckPointDetailss, variables: {
+                                filter: { routeCheckPointID: { eq: _departingStation.id } }
+                            }
+                        })
+                            .then((response) => setDepartureStationResult(response?.data?.listCheckPointDetailss?.items))
+                            .catch((error) => console.log(error))
+                        API.graphql({
+                            query: queries.listCheckPointDetailss, variables: {
+                                filter: { routeCheckPointID: { eq: _arrivalStation.id } }
+                            }
+                        })
+                            .then((response) => setArrivalStationResult(response?.data?.listCheckPointDetailss?.items))
+                            .catch((error) => console.log(error))
+                    }
+                    if (_arrivalStation.routeID !== _departingStation.routeID) {
+                        API.graphql({
+                            query: queries.listCheckPointDetailss, variables: {
+                                filter: { routeCheckPointID: { eq: _departingStation.id } }
+                            }
+                        })
+                            .then((response) => setDepartureStationResult(response?.data?.listCheckPointDetailss?.items))
+                            .catch((error) => console.log(error))
+                        API.graphql({
+                            query: queries.listCheckPointDetailss, variables: {
+                                filter: { routeCheckPointID: { eq: _arrivalStation.id } }
+                            }
+                        })
+                            .then((response) => setArrivalStationResult(response?.data?.listCheckPointDetailss?.items))
+                            .catch((error) => console.log(error))
+                    }
+                })
             })
-        })
+        }
     }
 
     return (

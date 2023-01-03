@@ -5,29 +5,38 @@ import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommu
 import Fontisto from 'react-native-vector-icons/dist/Fontisto'
 
 
-const RouteResultDetails = () => {
+const RouteResultDetails = ({ ...props }) => {
+
+    const {
+        _arrivalStation,
+        _departureStation,
+        calculateTimeToReachStation,
+        calculateTimeToReachDestination
+    } = props
 
     return (
         <>
-            <View>
+            <View style={{ width: '15%' }}>
                 <Text style={styles.boldText}>
-                    9:00
+                    {_departureStation.checkPointDepartureTime}
                 </Text>
                 <Text style={styles.boldText}>
-                    9:30
+                    {_arrivalStation.checkPointDepartureTime}
                 </Text>
             </View>
 
             <View style={styles.verticalLine} />
 
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={styles.detailsContainer}>
                 <View style={{ alignItems: 'center' }}>
                     <MaterialCommunityIcons
                         name="walk"
                         size={20}
                         color={'#d4d4d4'} />
 
-                    <Text style={{ fontSize: 12, color: '#fff' }}>15 min</Text>
+                    <Text style={{ fontSize: 12, color: '#fff' }}>
+                        {calculateTimeToReachStation()} min
+                    </Text>
                 </View>
 
                 <Fontisto
@@ -45,7 +54,7 @@ const RouteResultDetails = () => {
                     <Text style={{ fontSize: 12, color: '#fff' }}>35 min</Text>
                 </View>
 
-                <MaterialCommunityIcons
+                {/* <MaterialCommunityIcons
                     style={{ marginLeft: 10, marginRight: 10 }}
                     name="transit-transfer"
                     size={30}
@@ -58,7 +67,7 @@ const RouteResultDetails = () => {
                         color={'#d4d4d4'} />
 
                     <Text style={{ fontSize: 12, color: '#fff' }}>20 min</Text>
-                </View>
+                </View> */}
 
                 <Fontisto
                     style={{ marginLeft: 10 }}
@@ -72,14 +81,16 @@ const RouteResultDetails = () => {
                         size={20}
                         color={'#d4d4d4'} />
 
-                    <Text style={{ fontSize: 12, color: '#fff' }}>20 min</Text>
+                    <Text style={{ fontSize: 12, color: '#fff' }}>
+                        {calculateTimeToReachDestination()} min
+                    </Text>
                 </View>
 
-                <MaterialCommunityIcons
+                {/* <MaterialCommunityIcons
                     style={{ marginLeft: 10 }}
                     name="star-three-points"
                     size={20}
-                    color={'#d4d4d4'} />
+                    color={'#d4d4d4'} /> */}
             </View>
         </>
     )
@@ -88,14 +99,11 @@ const RouteResultDetails = () => {
 export default RouteResultDetails
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#1f2432',
+    detailsContainer: {
         flexDirection: 'row',
-        marginTop: 5,
-        paddingBottom: 10,
-        paddingLeft: 10,
-        paddingTop: 10,
-        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '75%'
     },
     boldText: {
         fontSize: 20,

@@ -215,6 +215,8 @@ export const getRouteCheckPoint = /* GraphQL */ `
           id
           checkPointDepartureTime
           checkPointCount
+          checkPointNumber
+          nextCheckPointDetailsID
           routeCheckPointID
           createdAt
           updatedAt
@@ -269,6 +271,8 @@ export const getCheckPointDetails = /* GraphQL */ `
       id
       checkPointDepartureTime
       checkPointCount
+      checkPointNumber
+      nextCheckPointDetailsID
       routeCheckPointID
       routeCheckPoint {
         id
@@ -312,6 +316,8 @@ export const listCheckPointDetailss = /* GraphQL */ `
         id
         checkPointDepartureTime
         checkPointCount
+        checkPointNumber
+        nextCheckPointDetailsID
         routeCheckPointID
         routeCheckPoint {
           id

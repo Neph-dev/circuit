@@ -364,6 +364,8 @@ export const createRouteCheckPoint = /* GraphQL */ `
           id
           checkPointDepartureTime
           checkPointCount
+          checkPointNumber
+          nextCheckPointDetailsID
           routeCheckPointID
           createdAt
           updatedAt
@@ -411,6 +413,8 @@ export const updateRouteCheckPoint = /* GraphQL */ `
           id
           checkPointDepartureTime
           checkPointCount
+          checkPointNumber
+          nextCheckPointDetailsID
           routeCheckPointID
           createdAt
           updatedAt
@@ -458,6 +462,8 @@ export const deleteRouteCheckPoint = /* GraphQL */ `
           id
           checkPointDepartureTime
           checkPointCount
+          checkPointNumber
+          nextCheckPointDetailsID
           routeCheckPointID
           createdAt
           updatedAt
@@ -478,6 +484,8 @@ export const createCheckPointDetails = /* GraphQL */ `
       id
       checkPointDepartureTime
       checkPointCount
+      checkPointNumber
+      nextCheckPointDetailsID
       routeCheckPointID
       routeCheckPoint {
         id
@@ -515,6 +523,8 @@ export const updateCheckPointDetails = /* GraphQL */ `
       id
       checkPointDepartureTime
       checkPointCount
+      checkPointNumber
+      nextCheckPointDetailsID
       routeCheckPointID
       routeCheckPoint {
         id
@@ -552,6 +562,8 @@ export const deleteCheckPointDetails = /* GraphQL */ `
       id
       checkPointDepartureTime
       checkPointCount
+      checkPointNumber
+      nextCheckPointDetailsID
       routeCheckPointID
       routeCheckPoint {
         id

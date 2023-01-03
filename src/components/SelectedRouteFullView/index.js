@@ -8,13 +8,22 @@ import LightBlueButton from '../../components/Buttons/LightBlueButton'
 
 const SelectedRouteFullView = ({ ...props }) => {
 
+    const {
+        _arrivalStation,
+        _departureStation,
+        setSwipeDirection,
+        setShowFullView,
+        showFullView,
+        routeArrivalResult
+    } = props
+
     const [hasPressed, setHasPressed] = useState(false)
 
     const itineraireInfo = [
         {
-            time: '07:00',
-            title: 'Eastgate',
-            description: `Departure \nBus ID: A55`,
+            time: _departureStation.checkPointDepartureTime,
+            title: _departureStation.routeCheckPoint.checkPointName,
+            description: `Departure`,
             lineColor: '#1f2432',
             lineWidth: 6,
             icon: <Image
@@ -23,9 +32,9 @@ const SelectedRouteFullView = ({ ...props }) => {
             />
         },
         {
-            time: '8:00',
-            title: 'Gandhi Square',
-            description: `Change Bus \nBus ID: A20`,
+            time: _arrivalStation.checkPointDepartureTime,
+            title: _arrivalStation.routeCheckPoint.checkPointName,
+            description: `Arrival \nBus ID: ${routeArrivalResult.lineNumber}`,
             lineColor: '#1f2432',
             lineWidth: 6,
             icon: <Image
@@ -33,16 +42,16 @@ const SelectedRouteFullView = ({ ...props }) => {
                 source={{ uri: 'https://i.postimg.cc/ydNsBpqQ/6122371.png' }}
             />
         },
-        {
-            time: '9:00',
-            title: 'Braamfontein',
-            description: 'Arrival',
-            lineColor: '#1f2432',
-            icon: <Image
-                style={{ width: 40, height: 40, marginTop: 15, marginLeft: 3 }}
-                source={{ uri: 'https://i.postimg.cc/ydNsBpqQ/6122371.png' }}
-            />
-        },
+        // {
+        //     time: '9:00',
+        //     title: 'Braamfontein',
+        //     description: 'Change Bus \nBus ID: A20',
+        //     lineColor: '#1f2432',
+        //     icon: <Image
+        //         style={{ width: 40, height: 40, marginTop: 15, marginLeft: 3 }}
+        //         source={{ uri: 'https://i.postimg.cc/ydNsBpqQ/6122371.png' }}
+        //     />
+        // },
     ]
 
     return (
@@ -50,8 +59,8 @@ const SelectedRouteFullView = ({ ...props }) => {
 
             <Pressable
                 onPress={() => {
-                    props.setSwipeDirection('SWIPE_DOWN')
-                    props.setShowFullView(!props.showFullView)
+                    setSwipeDirection('SWIPE_DOWN')
+                    setShowFullView(!showFullView)
                 }}
                 style={styles.iconContainer}>
                 <Feather name="x" size={30} color={"#000"} />
@@ -59,23 +68,7 @@ const SelectedRouteFullView = ({ ...props }) => {
 
             <View>
                 <Text style={styles.boldMediumText}>
-                    Eastgate to Braamfontein
-                </Text>
-            </View>
-            <View style={styles.elementContainer}>
-                <Text style={styles.smallText}>
-                    Sector name:
-                </Text>
-                <Text style={styles.smallText}>
-                    A
-                </Text>
-            </View>
-            <View style={styles.elementContainer}>
-                <Text style={styles.smallText}>
-                    Stops:
-                </Text>
-                <Text style={styles.smallText}>
-                    1
+                    {_departureStation.routeCheckPoint.checkPointName} To {_arrivalStation.routeCheckPoint.checkPointName}
                 </Text>
             </View>
             <View style={styles.elementContainer}>

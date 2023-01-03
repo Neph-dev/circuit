@@ -3,15 +3,26 @@ import React, { useState, useEffect } from 'react'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 import GestureRecognizer from 'react-native-swipe-gestures'
 
+import { API } from 'aws-amplify'
+import * as queries from '../../graphql/queries'
+
 import SelectedRouteFullView from '../../components/SelectedRouteFullView'
 
 
-const SelectedRoute = () => {
-    const [showFullView, setShowFullView] = useState(true)
+const SelectedRoute = ({ route }) => {
 
+    const { _departureStation, _arrivalStation } = route.params
+
+    const [routeDepartureResult, setRouteDepartureResult] = useState({})
+    const [routeArrivalResult, setRouteArrivalResult] = useState({})
+
+    const [showFullView, setShowFullView] = useState(true)
     const [swipeDirection, setSwipeDirection] = useState('SWIPE_DOWN')
 
     const onSwipe = (direction, state) => setSwipeDirection(direction)
+
+    console.log('routeDepartureResult', routeDepartureResult)
+    console.log('routeArrivalResult', routeArrivalResult)
 
     // Set initial Region to Johannesburg
     const initialRegion = {
@@ -25,6 +36,20 @@ const SelectedRoute = () => {
         if (swipeDirection === 'SWIPE_UP') {
             setShowFullView(true)
         }
+        API.graphql({
+            query: queries.listRoutes, variables: {
+                filter: { id: { eq: _departureStation.routeCheckPoint.routeID } }
+            }
+        })
+            .then((response) => setRouteDepartureResult(response?.data?.listRoutes?.items[0]))
+            .catch((error) => console.log(error))
+        API.graphql({
+            query: queries.listRoutes, variables: {
+                filter: { id: { eq: _arrivalStation.routeCheckPoint.routeID } }
+            }
+        })
+            .then((response) => setRouteArrivalResult(response?.data?.listRoutes?.items[0]))
+            .catch((error) => console.log(error))
     }, [])
 
     return (
@@ -41,9 +66,12 @@ const SelectedRoute = () => {
             {swipeDirection === 'SWIPE_UP' ?
                 <View style={styles.bottomFullViewContainer} >
                     <SelectedRouteFullView
+                        _departureStation={_departureStation}
+                        _arrivalStation={_arrivalStation}
                         setSwipeDirection={setSwipeDirection}
                         showFullView={showFullView}
-                        setShowFullView={setShowFullView} />
+                        setShowFullView={setShowFullView}
+                        routeArrivalResult={routeArrivalResult} />
                 </View>
                 :
                 <GestureRecognizer
