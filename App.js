@@ -14,6 +14,8 @@ import { UserDataProvider } from './src/contexts/UserDataProvider'
 // import { RoutesDataProvider } from './src/contexts/RoutesDataProvider'
 import { UserPreferencesDataProvider } from './src/contexts/UserPreferencesDataProvider'
 import { GetDataProvider } from './src/contexts/GetDataProvider'
+import { CreateProvider } from "./src/contexts/CreateProvider"
+import { DeleteProvider } from "./src/contexts/DeleteProvider"
 
 import Router from './src/routers'
 import NetworkErrorModal from './src/components/Modal/NetworkErrorModal'
@@ -32,15 +34,19 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <UserDataProvider>
-        <GetDataProvider>
-          <UserPreferencesDataProvider>
-            <View style={styles.container}>
-              <Router />
-            </View>
-          </UserPreferencesDataProvider>
-        </GetDataProvider>
-      </UserDataProvider>
+      <CreateProvider>
+        <DeleteProvider>
+          <UserDataProvider>
+            <GetDataProvider>
+              <UserPreferencesDataProvider>
+                <View style={styles.container}>
+                  <Router />
+                </View>
+              </UserPreferencesDataProvider>
+            </GetDataProvider>
+          </UserDataProvider>
+        </DeleteProvider>
+      </CreateProvider>
     </NavigationContainer>
   )
 }

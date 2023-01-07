@@ -754,3 +754,39 @@ export const onDeleteUserScanHistory = /* GraphQL */ `
     }
   }
 `;
+export const onCreateUserFavoriteRoute = /* GraphQL */ `
+  subscription OnCreateUserFavoriteRoute($owner: String!) {
+    onCreateUserFavoriteRoute(owner: $owner) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onUpdateUserFavoriteRoute = /* GraphQL */ `
+  subscription OnUpdateUserFavoriteRoute($owner: String!) {
+    onUpdateUserFavoriteRoute(owner: $owner) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onDeleteUserFavoriteRoute = /* GraphQL */ `
+  subscription OnDeleteUserFavoriteRoute($owner: String!) {
+    onDeleteUserFavoriteRoute(owner: $owner) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;

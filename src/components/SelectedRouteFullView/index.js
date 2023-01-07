@@ -1,9 +1,14 @@
 import { StyleSheet, Pressable, Text, View, Image } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext } from 'react'
 import Timeline from 'react-native-timeline-flatlist'
 
+import * as mutations from '../../graphql/mutations'
+
 import Feather from 'react-native-vector-icons/dist/Feather'
+
 import LightBlueButton from '../../components/Buttons/LightBlueButton'
+
+import { CreateContext } from '../../contexts/CreateProvider'
 
 
 const SelectedRouteFullView = ({ ...props }) => {
@@ -14,10 +19,21 @@ const SelectedRouteFullView = ({ ...props }) => {
         setSwipeDirection,
         setShowFullView,
         showFullView,
-        routeArrivalResult
+        routeArrivalResult,
+        setRefreshFavoriteRoutes,
+        isRouteSaved
     } = props
 
-    const [hasPressed, setHasPressed] = useState(false)
+    const { createData, isLoadingOnCreate } = useContext(CreateContext)
+
+    const onSaveRoute = async () => {
+        const data = {
+            departureRouteDetailsID: _departureStation.id,
+            arrivalDetailsRouteID: _arrivalStation.id
+        }
+        await createData(mutations.createUserFavoriteRoute, data)
+        setRefreshFavoriteRoutes(true)
+    }
 
     const itineraireInfo = [
         {
@@ -111,11 +127,12 @@ const SelectedRouteFullView = ({ ...props }) => {
                     }}
                 />
             </View>
-
-            <LightBlueButton
-                hasPressed={hasPressed}
-                handleOnPress={() => { }}
-                label='Save this route' />
+            {!isRouteSaved && (
+                <LightBlueButton
+                    hasPressed={isLoadingOnCreate}
+                    handleOnPress={onSaveRoute}
+                    label='Save this route' />
+            )}
         </View>
     )
 }

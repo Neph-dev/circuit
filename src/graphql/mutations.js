@@ -844,3 +844,48 @@ export const deleteUserScanHistory = /* GraphQL */ `
     }
   }
 `;
+export const createUserFavoriteRoute = /* GraphQL */ `
+  mutation CreateUserFavoriteRoute(
+    $input: CreateUserFavoriteRouteInput!
+    $condition: ModelUserFavoriteRouteConditionInput
+  ) {
+    createUserFavoriteRoute(input: $input, condition: $condition) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const updateUserFavoriteRoute = /* GraphQL */ `
+  mutation UpdateUserFavoriteRoute(
+    $input: UpdateUserFavoriteRouteInput!
+    $condition: ModelUserFavoriteRouteConditionInput
+  ) {
+    updateUserFavoriteRoute(input: $input, condition: $condition) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const deleteUserFavoriteRoute = /* GraphQL */ `
+  mutation DeleteUserFavoriteRoute(
+    $input: DeleteUserFavoriteRouteInput!
+    $condition: ModelUserFavoriteRouteConditionInput
+  ) {
+    deleteUserFavoriteRoute(input: $input, condition: $condition) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;

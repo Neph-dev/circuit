@@ -1,10 +1,12 @@
 import { StyleSheet, View } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 import GestureRecognizer from 'react-native-swipe-gestures'
 
 import { API } from 'aws-amplify'
 import * as queries from '../../graphql/queries'
+
+import { UserPreferencesContext } from '../../contexts/UserPreferencesDataProvider'
 
 import SelectedRouteFullView from '../../components/SelectedRouteFullView'
 
@@ -13,16 +15,25 @@ const SelectedRoute = ({ route }) => {
 
     const { _departureStation, _arrivalStation } = route.params
 
+    const { favoriteRoutes, setRefreshFavoriteRoutes } = useContext(UserPreferencesContext)
+
     const [routeDepartureResult, setRouteDepartureResult] = useState({})
     const [routeArrivalResult, setRouteArrivalResult] = useState({})
 
     const [showFullView, setShowFullView] = useState(true)
     const [swipeDirection, setSwipeDirection] = useState('SWIPE_DOWN')
 
+    const [isRouteSaved, setIsRouteSaved] = useState()
+
     const onSwipe = (direction, state) => setSwipeDirection(direction)
 
-    console.log('routeDepartureResult', routeDepartureResult)
-    console.log('routeArrivalResult', routeArrivalResult)
+    const filterDown = () => {
+        favoriteRoutes.filter((item) => {
+            if (item.departureRouteDetailsID === _departureStation.id) {
+                setIsRouteSaved(true)
+            }
+        })
+    }
 
     // Set initial Region to Johannesburg
     const initialRegion = {
@@ -33,23 +44,31 @@ const SelectedRoute = ({ route }) => {
     }
 
     useEffect(() => {
+        filterDown()
         if (swipeDirection === 'SWIPE_UP') {
             setShowFullView(true)
         }
-        API.graphql({
-            query: queries.listRoutes, variables: {
-                filter: { id: { eq: _departureStation.routeCheckPoint.routeID } }
-            }
-        })
-            .then((response) => setRouteDepartureResult(response?.data?.listRoutes?.items[0]))
-            .catch((error) => console.log(error))
-        API.graphql({
-            query: queries.listRoutes, variables: {
-                filter: { id: { eq: _arrivalStation.routeCheckPoint.routeID } }
-            }
-        })
-            .then((response) => setRouteArrivalResult(response?.data?.listRoutes?.items[0]))
-            .catch((error) => console.log(error))
+        const fetchDeparture = async () => {
+            await API.graphql({
+                query: queries.listRoutes, variables: {
+                    filter: { id: { eq: _departureStation.routeCheckPoint.routeID } }
+                }
+            })
+                .then((response) => setRouteDepartureResult(response?.data?.listRoutes?.items[0]))
+                .catch((error) => console.log(error))
+        }
+        fetchDeparture()
+
+        const fetchArrival = async () => {
+            API.graphql({
+                query: queries.listRoutes, variables: {
+                    filter: { id: { eq: _arrivalStation.routeCheckPoint.routeID } }
+                }
+            })
+                .then((response) => setRouteArrivalResult(response?.data?.listRoutes?.items[0]))
+                .catch((error) => console.log(error))
+        }
+        fetchArrival()
     }, [])
 
     return (
@@ -71,7 +90,10 @@ const SelectedRoute = ({ route }) => {
                         setSwipeDirection={setSwipeDirection}
                         showFullView={showFullView}
                         setShowFullView={setShowFullView}
-                        routeArrivalResult={routeArrivalResult} />
+                        routeArrivalResult={routeArrivalResult}
+
+                        isRouteSaved={isRouteSaved}
+                        setRefreshFavoriteRoutes={setRefreshFavoriteRoutes} />
                 </View>
                 :
                 <GestureRecognizer

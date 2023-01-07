@@ -108,3 +108,11 @@ type UserScanHistory
   status: String!,
   numberOfTagsDebited: Int!,
 }
+
+type UserFavoriteRoute
+  @model
+  @auth(rules: [{allow: owner, operations: [read, create, delete]}]) {
+  id: ID!,
+  departureRouteDetailsID: String!,
+  arrivalDetailsRouteID: String!,
+}

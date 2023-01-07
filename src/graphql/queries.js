@@ -517,3 +517,38 @@ export const listUserScanHistorys = /* GraphQL */ `
     }
   }
 `;
+export const getUserFavoriteRoute = /* GraphQL */ `
+  query GetUserFavoriteRoute($id: ID!) {
+    getUserFavoriteRoute(id: $id) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const listUserFavoriteRoutes = /* GraphQL */ `
+  query ListUserFavoriteRoutes(
+    $filter: ModelUserFavoriteRouteFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listUserFavoriteRoutes(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        departureRouteDetailsID
+        arrivalDetailsRouteID
+        createdAt
+        updatedAt
+        owner
+      }
+      nextToken
+    }
+  }
+`;

@@ -52,6 +52,9 @@ export const UserPreferencesDataProvider = ({ children }) => {
     const [userScanHistory, setUserScanHistory] = useState([])
     const [refreshUserScanHistory, setRefreshUserScanHistory] = useState(false)
 
+    const [favoriteRoutes, setFavoriteRoutes] = useState([])
+    const [refreshFavoriteRoutes, setRefreshFavoriteRoutes] = useState(false)
+
     const fetchWeatherData = async () => {
         let latitude
         let longitude
@@ -146,7 +149,7 @@ export const UserPreferencesDataProvider = ({ children }) => {
         }
     }
 
-    const fetchUserScanHistory = async (operatorData) => {
+    const fetchUserScanHistory = async () => {
         try {
             setLoader(true)
             const userScanHistoryResults = await API.graphql({ query: queries.listUserScanHistorys })
@@ -160,12 +163,25 @@ export const UserPreferencesDataProvider = ({ children }) => {
         }
     }
 
+    const fetchFavoriteRoutes = async () => {
+        await API.graphql({ query: queries.listUserFavoriteRoutes })
+            .then((response) => {
+                setFavoriteRoutes(response?.data?.listUserFavoriteRoutes?.items)
+                setLoader(false)
+            })
+            .catch((error) => {
+                setLoader(false)
+                console.log(error)
+            })
+    }
+
     // On load, fetch the user preferences data
     useEffect(() => {
         fetchUserSettings()
         fetchUserTags()
         fetchDefaultOperator()
         fetchUserScanHistory()
+        fetchFavoriteRoutes()
     }, [])
 
     // If the state changes to true make a new request
@@ -193,6 +209,10 @@ export const UserPreferencesDataProvider = ({ children }) => {
         fetchUserScanHistory()
         setRefreshUserScanHistory(false)
     }
+    if (refreshFavoriteRoutes) {
+        fetchFavoriteRoutes()
+        setRefreshFavoriteRoutes(false)
+    }
     return (
         <UserPreferencesContext.Provider
             value={{
@@ -219,6 +239,10 @@ export const UserPreferencesDataProvider = ({ children }) => {
                 refreshUserScanHistory,
                 setRefreshUserScanHistory,
                 userScanHistory,
+
+                fetchFavoriteRoutes,
+                favoriteRoutes,
+                setRefreshFavoriteRoutes,
             }}>
             {children}
         </UserPreferencesContext.Provider>

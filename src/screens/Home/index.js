@@ -29,7 +29,7 @@ export default function Home({ route }) {
         navigation.navigate('ManageCredit', { operatorData })
     }
     const onPressToFavoriteRoute = () => {
-        navigation.navigate('FavoriteRoutes', { operatorData })
+        navigation.navigate('FavoriteRoutes')
     }
 
     const backgroundImage = { uri: mapBackground }

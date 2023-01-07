@@ -3,7 +3,7 @@
 
 
 import React, { useState, useContext } from 'react'
-import { View, StyleSheet, Text, Pressable, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 
 import { GetDataContext } from '../../contexts/GetDataProvider'
@@ -37,6 +37,8 @@ export default function SearchRoute() {
     const [minDepartureDistance, setMinDepartureDistance] = useState()
     const [minArrivalDistance, setMinArrivalDistance] = useState()
 
+    const [loadingRoute, setLoadingRoute] = useState(false)
+
     const walkingSpeed = 5 //* Km/h
 
     const calculateTimeToReachStation = () => {
@@ -48,16 +50,10 @@ export default function SearchRoute() {
     }
 
     const checkDay = (_departureStation) => {
-        _departureStation.routeCheckPoint.checkPointDay.filter((item) => {
-            if ((item.includes('businessDays')
-                && (selectedDay !== 'Saturday' || selectedDay !== 'Sunday'))
-                || item.includes('allWeek')
-                || item.includes(selectedDay)) {
-                return true
-            }
-            else {
-                return false
-            }
+        (_departureStation.routeCheckPoint.checkPointDay).filter((item) => {
+            if ((item === 'businessDays' &&
+                selectedDay !== 'Saturday' || selectedDay !== 'Sunday'
+            )) return true
         })
     }
 
@@ -80,7 +76,12 @@ export default function SearchRoute() {
                 setArrivalStationResult={setArrivalStationResult}
 
                 setMinDepartureDistance={setMinDepartureDistance}
-                setMinArrivalDistance={setMinArrivalDistance} />
+                setMinArrivalDistance={setMinArrivalDistance}
+                minArrivalDistance={minArrivalDistance}
+                setLoadingRoute={setLoadingRoute} />
+
+            {loadingRoute && <ActivityIndicator size="large" color="#1f2432" />}
+
             {(departureStationResult.length !== 0 && arrivalStationResult.length !== 0) && (
                 <>
                     <View style={{
@@ -104,8 +105,7 @@ export default function SearchRoute() {
                                     fontSize: 13,
                                 }}>{dayName.slice(0, 3)}</Text>
                             </Pressable>
-                        ))
-                        }
+                        ))}
                     </View>
                     <ScrollView style={styles.backgroundList}>
                         {departureStationResult.map((_departureStation) => (
@@ -115,25 +115,22 @@ export default function SearchRoute() {
                                     && _departureStation.checkPointNumber === _arrivalStation.checkPointNumber)) ? (
                                     <Pressable
                                         key={index}
-                                        onPress={() => {
-                                            navigation.navigate('SelectedRoute', { _departureStation })
-                                        }}
+                                        onPress={() => navigation.navigate('SelectedRoute', { _departureStation, _arrivalStation })}
                                         style={styles.container}>
                                         <RouteResultDetails
                                             calculateTimeToReachDestination={calculateTimeToReachDestination}
                                             calculateTimeToReachStation={calculateTimeToReachStation}
                                             _departureStation={_departureStation}
                                             _arrivalStation={_arrivalStation} />
-                                    </Pressable>)
+                                    </Pressable>
+                                )
                                     :
                                     ((_departureStation.routeCheckPoint.routeID !== _arrivalStation.routeCheckPoint.routeID
                                         && _departureStation.checkPointNumber === _arrivalStation.checkPointNumber))
                                         ? (
                                             <Pressable
                                                 key={index}
-                                                onPress={() => {
-                                                    navigation.navigate('SelectedRoute', { _departureStation, _arrivalStation })
-                                                }}
+                                                onPress={() => navigation.navigate('SelectedRoute', { _departureStation, _arrivalStation })}
                                                 style={styles.container}>
                                                 <RouteResultDetails
                                                     calculateTimeToReachDestination={calculateTimeToReachDestination}

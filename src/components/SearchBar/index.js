@@ -29,23 +29,21 @@ export default function SearchBar({ ...props }) {
 
         routeCheckPoint,
         setDepartureStationResult,
-        departureStationResult,
         setArrivalStationResult,
-        arrivalStationResult,
 
         setMinDepartureDistance,
-        setMinArrivalDistance
+        setMinArrivalDistance,
+
+        setLoadingRoute,
     } = props
 
     const [showSearchBar, setShowSearchBar] = useState(false)
     const [searchBarLabel, setSearchBarLabel] = useState()
 
     const [departureDistances, setDepartureDistances] = useState([])
-    const [filteredDepartingStation, setFilteredDepartingStation] = useState([])
+    const [filteredDepartingStation, setFilteredDepartingStation] = useState()
     const [arrivalDistances, setArrivalDistances] = useState([])
     const [filteredArrivalStation, setFilteredArrivalStation] = useState([])
-
-
 
     const TextAbstract = (text, length) => {
         if (text == null) return ""
@@ -71,6 +69,7 @@ export default function SearchBar({ ...props }) {
     const onSelectAddress = async (data, details) => {
         setShowSearchBar(false)
         setSearchBarLabel()
+        setLoadingRoute(true)
         if (searchBarLabel === 'Departure') {
             setDepartureLatitude(details.geometry.location.lat)
             setDepartureLongitude(details.geometry.location.lng)
@@ -100,11 +99,14 @@ export default function SearchBar({ ...props }) {
                         }
                     }
                 })
-                    .then((response) => setFilteredDepartingStation(response?.data?.listRouteCheckPoints?.items))
+                    .then((response) => {
+                        setFilteredDepartingStation(response?.data?.listRouteCheckPoints?.items)
+                        fetchDetails(filteredArrivalStation)
+                    })
                     .catch((error) => console.log(error))
             })
         }
-        if (searchBarLabel === 'Arrival') {
+        else if (searchBarLabel === 'Arrival') {
             setArrivalLatitude(details.geometry.location.lat)
             setArrivalLongitude(details.geometry.location.lng)
             setArrivalAddress(data.description)
@@ -128,17 +130,20 @@ export default function SearchBar({ ...props }) {
 
                 await API.graphql({
                     query: queries.listRouteCheckPoints, variables: {
-                        filter: {
-                            checkPointName: { eq: routeCheckPoint[findIndexEle].checkPointName }
-                        }
+                        filter: { id: { eq: routeCheckPoint[findIndexEle].id } }
                     }
                 })
-                    .then((response) => setFilteredArrivalStation(response?.data?.listRouteCheckPoints?.items))
+                    .then(response => {
+                        setFilteredArrivalStation(response.data.listRouteCheckPoints.items)
+                        fetchDetails(response.data.listRouteCheckPoints.items)
+                    })
                     .catch((error) => console.log(error))
             })
         }
+    }
 
-        if (filteredArrivalStation.length > 0 && filteredDepartingStation.length > 0) {
+    const fetchDetails = (filteredArrivalStation) => {
+        if (filteredArrivalStation !== undefined && filteredDepartingStation !== undefined) {
             filteredDepartingStation.filter((_departingStation) => {
                 filteredArrivalStation.filter((_arrivalStation) => {
                     if (_arrivalStation.routeID === _departingStation.routeID) {
@@ -147,14 +152,15 @@ export default function SearchBar({ ...props }) {
                                 filter: { routeCheckPointID: { eq: _departingStation.id } }
                             }
                         })
-                            .then((response) => setDepartureStationResult(response?.data?.listCheckPointDetailss?.items))
+                            .then((response) => setDepartureStationResult(response.data.listCheckPointDetailss.items))
                             .catch((error) => console.log(error))
+
                         API.graphql({
                             query: queries.listCheckPointDetailss, variables: {
                                 filter: { routeCheckPointID: { eq: _arrivalStation.id } }
                             }
                         })
-                            .then((response) => setArrivalStationResult(response?.data?.listCheckPointDetailss?.items))
+                            .then((response) => setArrivalStationResult(response.data.listCheckPointDetailss.items))
                             .catch((error) => console.log(error))
                     }
                     if (_arrivalStation.routeID !== _departingStation.routeID) {
@@ -173,6 +179,7 @@ export default function SearchBar({ ...props }) {
                             .then((response) => setArrivalStationResult(response?.data?.listCheckPointDetailss?.items))
                             .catch((error) => console.log(error))
                     }
+                    setLoadingRoute(false)
                 })
             })
         }

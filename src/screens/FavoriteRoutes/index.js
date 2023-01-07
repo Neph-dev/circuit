@@ -2,173 +2,121 @@
 
 
 import { StyleSheet, Text, View, ScrollView, Pressable, ActivityIndicator } from 'react-native'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 
-import { API } from 'aws-amplify'
 import * as mutations from '../../graphql/mutations'
+
+import { UserPreferencesContext } from '../../contexts/UserPreferencesDataProvider'
+import { GetDataContext } from '../../contexts/GetDataProvider'
+import { DeleteContext } from '../../contexts/DeleteProvider'
 
 import FontAwesome5 from 'react-native-vector-icons/dist/FontAwesome5'
 import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons'
 
-import { RoutesContext } from '../../contexts/RoutesDataProvider'
-import { UserPreferencesContext } from '../../contexts/UserPreferencesDataProvider'
 
-
-export default function FavoriteRoutes({ ...props }) {
-
-  const { routes, routeDetails } = useContext(RoutesContext)
-  const { favoriteRoutes, loader, setRefreshFavorite, } = useContext(UserPreferencesContext)
+const FavoriteRoutes = () => {
 
   const navigation = useNavigation()
 
-  const [favoriteRouteID, setFavoriteRouteID] = useState('')
+  const { favoriteRoutes, setRefreshFavoriteRoutes } = useContext(UserPreferencesContext)
+  const { checkPointDetails } = useContext(GetDataContext)
+  const { deleteData, isLoadingDelete } = useContext(DeleteContext)
 
-  // Route states
-  const [departureRouteName, setDepartureRouteName] = useState('')
-  const [arrivalRouteName, setArrivalRouteName] = useState('')
-  const [sectorName, setSectorName] = useState('')
-  const [routeSectorOperatorID, setRouteSectorOperatorID] = useState('')
-  const [originLatitude, setOriginLatitude] = useState('')
-  const [originLongitude, setOriginLongitude] = useState('')
-  const [destinationLatitude, setDestinationLatitude] = useState('')
-  const [destinationLongitude, setDestinationLongitude] = useState('')
-
-  // RouteDetails states
-  const [routeDetailsID, setRouteDetailsID] = useState('')
-  const [departureBusNumber, setDepartureBusNumber] = useState('')
-  const [departureRouteTime, setDepartureRouteTime] = useState('')
-  const [connectionBusNumber, setConnectionBusNumber] = useState('')
-  const [connectionRouteName, setConnectionRouteName] = useState('')
-  const [connectionDepartureTime, setConnectionDepartureTime] = useState('')
-  const [arrivalRouteTime, setArrivalRouteTime] = useState('')
-  const [routeID, setRouteID] = useState('')
-  const [showFullView, setShowFullView] = useState(true)
-
-  const routeData = {
-    departureRouteName: departureRouteName,
-    arrivalRouteName: arrivalRouteName,
-    routeSectorName: sectorName,
-    routeSectorOperatorID: routeSectorOperatorID,
-    originLatitude: originLatitude,
-    originLongitude: originLongitude,
-    destinationLatitude: destinationLatitude,
-    destinationLongitude: destinationLongitude,
-  }
-
-  const routeInfoData = {
-    routeDetailsID: routeDetailsID,
-    departureBusNumber: departureBusNumber,
-    departureRouteTime: departureRouteTime,
-    connectionBusNumber: connectionBusNumber,
-    connectionRouteName: connectionRouteName,
-    connectionDepartureTime: connectionDepartureTime,
-    arrivalRouteTime: arrivalRouteTime,
-    routeID: routeID,
-  }
-
-  const onPressToRouteDetails = () => {
-    const routeData = {
-      routeID: routeID,
-      routeConnectionID: routeID,
-      departureRouteName: departureRouteName,
-      arrivalRouteName: arrivalRouteName,
-      routeSectorOperatorID: routeSectorOperatorID,
-      routeSectorName: sectorName,
-      originLatitude: originLatitude,
-      originLongitude: originLongitude,
-      destinationLatitude: destinationLatitude,
-      destinationLongitude: destinationLongitude,
-    }
-
-    const opreratorInfoData = props.opreratorInfoData
-    navigation.navigate('FindRouteAndTime',
-      { opreratorInfoData, routeData, showFullView, routeInfoData })
-    // navigation.navigate('RouteDetails', { routeInfoData, routeData })
-  }
+  const [departureDetails, setDepartureDetails] = useState([])
+  const [arrivalDetails, setArrivalDetails] = useState([])
 
   // Delete a saved route.
-  const deleteFavoriteRoute = async () => {
-    try {
-      const favoriteRouteDetails = { id: favoriteRouteID }
-
-      const deleteFavoriteRoute = await API.graphql({
-        query: mutations.deleteFavoriteRoutes,
-        variables: { input: favoriteRouteDetails }
-      })
-      setRefreshFavorite(true)
-    }
-    catch (error) { console.log(error) }
+  const deleteFavoriteRoute = async (id) => {
+    const data = { id: id }
+    await deleteData(mutations.deleteUserFavoriteRoute, data)
+    setRefreshFavoriteRoutes(true)
   }
+
+  const onGoToRouteDetails = (_departureStation, _arrivalStation) => {
+    navigation.navigate('SelectedRoute', { _departureStation, _arrivalStation })
+  }
+
+  const filterDeparture = () => {
+    favoriteRoutes.filter((item) => {
+      checkPointDetails.filter(_checkPointDetails => {
+        if (_checkPointDetails?.id?.includes(item.departureRouteDetailsID)) {
+          if (!departureDetails.includes(_checkPointDetails.id)) {
+            return departureDetails.push(_checkPointDetails)
+          }
+        }
+      })
+    })
+  }
+
+  const filterArrival = () => {
+    favoriteRoutes.filter((item) => {
+      checkPointDetails.filter(_checkPointDetails => {
+        if (_checkPointDetails?.id?.includes(item.arrivalDetailsRouteID)) {
+          if (!arrivalDetails.includes(_checkPointDetails.id)) {
+            return arrivalDetails.push(_checkPointDetails)
+          }
+        }
+      })
+    })
+  }
+
+  useEffect(() => {
+    filterDeparture()
+    filterArrival()
+    setRefreshFavoriteRoutes(true)
+  }, [])
 
   return (
     <ScrollView style={styles.screenContainer}>
 
       <View style={styles.boxContainer}>
 
-        {loader && (<ActivityIndicator size="large" />)}
+        {isLoadingDelete && <ActivityIndicator size="large" />}
 
         <View style={styles.cardsContainer}>
 
-          {favoriteRoutes.map((favoriteRoute, index) => (
-            routes?.map((route) => (
-              route.id === favoriteRoute.routeID ? (
-                routeDetails.map((routeDetails) => (
-                  routeDetails.id === favoriteRoute.routeDetailsID ? (
+          {favoriteRoutes.map((_favoriteRoutes) => (
+            departureDetails.map((_departureDetails) => (
+              arrivalDetails.map((_arrivalDetails, index) => (
+                (_favoriteRoutes.departureRouteDetailsID === _departureDetails.id
+                  && _favoriteRoutes.arrivalDetailsRouteID === _arrivalDetails.id) ?
+                  <Pressable
+                    key={index}
+                    onPress={() => onGoToRouteDetails(_departureDetails, _arrivalDetails)}
+                    style={styles.card}>
+
+                    <FontAwesome5 name='route' size={60} style={styles.icon} color={'#ccc'} />
+                    <Text style={styles.cardTextBold}>
+                      {_departureDetails.routeCheckPoint.checkPointName} - {_arrivalDetails.routeCheckPoint.checkPointName}
+                    </Text>
+                    <Text style={styles.cardTextBoldSm}>
+                      {_departureDetails.checkPointDepartureTime} - {_arrivalDetails.checkPointDepartureTime}
+                    </Text>
+                    {/* <Text style={styles.cardTextBoldSm}>
+                      A
+                    </Text> */}
                     <Pressable
-                      onPressIn={() => {
-                        setDepartureRouteName(route.departureRouteName)
-                        setArrivalRouteName(route.arrivalRouteName)
-                        setSectorName(route.routeSector.sectorName)
-                        setRouteSectorOperatorID(route.routeSector.operatorID)
-                        setOriginLatitude(route.originLatitude)
-                        setOriginLongitude(route.originLongitude)
-                        setOriginLongitude(route.originLongitude)
-                        setDestinationLatitude(route.destinationLatitude)
-                        setDestinationLongitude(route.destinationLongitude)
-
-                        setRouteDetailsID(routeDetails.id)
-                        setDepartureBusNumber(routeDetails.departureBusNumber)
-                        setDepartureRouteTime(routeDetails.departureRouteTime)
-                        setConnectionBusNumber(routeDetails.connectionBusNumber)
-                        setConnectionRouteName(routeDetails.connectionRouteName)
-                        setConnectionDepartureTime(routeDetails.connectionDepartureTime)
-                        setArrivalRouteTime(routeDetails.arrivalRouteTime)
-                        setRouteID(routeDetails.routeID)
-                      }}
-                      onPressOut={onPressToRouteDetails}
-                      style={styles.card} key={index}>
-
-                      <FontAwesome5 name='route' size={60} style={styles.icon} color={'#ccc'} />
-                      <Text style={styles.cardTextBold}>
-                        {route.departureRouteName} to {route.arrivalRouteName}
-                      </Text>
-                      <Text style={styles.cardTextBoldSm}>
-                        {routeDetails.departureRouteTime} - {routeDetails.arrivalRouteTime}
-                      </Text>
-                      <Text style={styles.cardTextBoldSm}>
-                        {routeDetails.sectorName}
-                      </Text>
-                      <Pressable
-                        onPressIn={() => setFavoriteRouteID(favoriteRoute.id)}
-                        style={styles.iconRightBottom} onPress={deleteFavoriteRoute}>
-                        <MaterialCommunityIcons
-                          name='delete'
-                          size={40}
-                          color={'red'} />
-                      </Pressable>
+                      onPress={() => { deleteFavoriteRoute(_favoriteRoutes.id) }}
+                      style={styles.iconRightBottom} >
+                      <MaterialCommunityIcons
+                        name='delete'
+                        size={40}
+                        color={'red'} />
                     </Pressable>
-                  ) : []))
-              ) : []
+                  </Pressable>
+                  : []
+              ))
             ))
           ))}
-
         </View>
       </View>
 
     </ScrollView >
   )
 }
+
+export default FavoriteRoutes
 
 const styles = StyleSheet.create({
   screenContainer: {
@@ -225,7 +173,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     color: '#000',
     alignItems: 'center',
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 45,

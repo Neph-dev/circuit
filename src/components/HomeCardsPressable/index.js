@@ -27,8 +27,7 @@ const HomeCardsPressable = ({ ...props }) => {
         },
         {
             title: "Favorite Routes",
-            onPress: () => { },
-            // onPress: onPressToFavoriteRoute,
+            onPress: onPressToFavoriteRoute,
             icon: <MaterialCommunityIcons name='star-three-points'
                 size={50}
                 style='icon'
