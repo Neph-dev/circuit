@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native'
-import React, { useState, useEffect, useContext } from 'react'
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
+import React, { useState, useEffect, useContext, useRef } from 'react'
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps'
 import GestureRecognizer from 'react-native-swipe-gestures'
+import MapViewDirections from 'react-native-maps-directions';
 
 import { API } from 'aws-amplify'
 import * as queries from '../../graphql/queries'
@@ -9,6 +10,7 @@ import * as queries from '../../graphql/queries'
 import { UserPreferencesContext } from '../../contexts/UserPreferencesDataProvider'
 
 import SelectedRouteFullView from '../../components/SelectedRouteFullView'
+import { GOOGLE_MAPS_KEY } from '../../keys'
 
 
 const SelectedRoute = ({ route }) => {
@@ -16,6 +18,8 @@ const SelectedRoute = ({ route }) => {
     const { _departureStation, _arrivalStation } = route.params
 
     const { favoriteRoutes, setRefreshFavoriteRoutes } = useContext(UserPreferencesContext)
+
+    const mapRef = useRef()
 
     const [routeDepartureResult, setRouteDepartureResult] = useState({})
     const [routeArrivalResult, setRouteArrivalResult] = useState({})
@@ -42,6 +46,28 @@ const SelectedRoute = ({ route }) => {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
     }
+
+    const markerArray = [
+        {
+            latitude: parseFloat(_departureStation.routeCheckPoint.checkPointLatitude),
+            longitude: parseFloat(_departureStation.routeCheckPoint.checkPointLongitude),
+            title: _departureStation.routeCheckPoint.checkPointName,
+            description: 'Depart at ' + _departureStation.checkPointDepartureTime,
+        },
+        {
+            latitude: parseFloat(_arrivalStation.routeCheckPoint.checkPointLatitude),
+            longitude: parseFloat(_arrivalStation.routeCheckPoint.checkPointLongitude),
+            title: _arrivalStation.routeCheckPoint.checkPointName,
+            description: 'Arrive at ' + _arrivalStation.checkPointDepartureTime,
+        },
+    ]
+
+    useEffect(() => {
+        if (mapRef.current) {
+            // list of _id's must same that has been provided to the identifier props of the Marker
+            mapRef.current.fitToSuppliedMarkers(markerArray.map(({ _id }) => _id));
+        }
+    }, [markerArray]);
 
     useEffect(() => {
         filterDown()
@@ -76,9 +102,35 @@ const SelectedRoute = ({ route }) => {
 
             <View>
                 <MapView
+                    ref={mapRef}
                     provider={PROVIDER_GOOGLE}
                     style={{ width: '100%', height: '100%' }}
                     initialRegion={initialRegion}>
+                    {markerArray.map((_marker, index) => (
+                        <Marker
+                            key={index}
+                            // image={{ uri: 'https://i.postimg.cc/j5MFzxpZ/bus-stop-1.png' }}
+                            image={{ uri: 'https://i.postimg.cc/d04BfW50/bus-stop-2.png' }}
+                            coordinate={{
+                                latitude: _marker.latitude,
+                                longitude: _marker.longitude
+                            }}
+                            title={_marker.title}
+                            description={_marker.description} />
+                    ))}
+                    <MapViewDirections
+                        origin={{
+                            latitude: parseFloat(_departureStation.routeCheckPoint.checkPointLatitude),
+                            longitude: parseFloat(_departureStation.routeCheckPoint.checkPointLongitude),
+                        }}
+                        destination={{
+                            latitude: parseFloat(_arrivalStation.routeCheckPoint.checkPointLatitude),
+                            longitude: parseFloat(_arrivalStation.routeCheckPoint.checkPointLongitude),
+                        }}
+                        apikey={GOOGLE_MAPS_KEY}
+                        strokeWidth={5}
+                        timePrecision="now"
+                        strokeColor={'#000000'} />
                 </MapView>
             </View>
 
@@ -91,7 +143,6 @@ const SelectedRoute = ({ route }) => {
                         showFullView={showFullView}
                         setShowFullView={setShowFullView}
                         routeArrivalResult={routeArrivalResult}
-
                         isRouteSaved={isRouteSaved}
                         setRefreshFavoriteRoutes={setRefreshFavoriteRoutes} />
                 </View>

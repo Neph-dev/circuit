@@ -4,6 +4,7 @@
 import { StyleSheet, Text, View, ScrollView, Pressable, ActivityIndicator } from 'react-native'
 import React, { useContext, useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
+import PushNotification, { Importance } from 'react-native-push-notification'
 
 import * as mutations from '../../graphql/mutations'
 
@@ -37,6 +38,27 @@ const FavoriteRoutes = () => {
     navigation.navigate('SelectedRoute', { _departureStation, _arrivalStation })
   }
 
+  const notification = () => {
+
+    const date = new Date(Date.now())
+    date.setHours(12)
+    date.setMinutes(42)
+
+    PushNotification.localNotificationSchedule({
+      channelId: 'saved-route',
+      id: 0,
+      title: 'Almost there!',
+      message: 'Your ride arrives in 30 min',
+      date: date,
+      allowWhileIdle: true,
+      repeatTime: 1,
+      importance: Importance.HIGH,
+      vibrate: true,
+      vibration: 300,
+      repeatType: "day"
+    })
+  }
+
   const filterDeparture = () => {
     favoriteRoutes.filter((item) => {
       checkPointDetails.filter(_checkPointDetails => {
@@ -62,6 +84,7 @@ const FavoriteRoutes = () => {
   }
 
   useEffect(() => {
+    notification()
     filterDeparture()
     filterArrival()
     setRefreshFavoriteRoutes(true)
