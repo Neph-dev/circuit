@@ -12,7 +12,7 @@ import { UserPreferencesContext } from '../../contexts/UserPreferencesDataProvid
 export default function ScanFailed({ route }) {
 
   const navigation = useNavigation()
-  const { operatorData } = route.params
+  const { operatorData, failureReason } = route.params
   const { fetchUserTags, userTags } = useContext(UserPreferencesContext)
 
   useEffect(() => { fetchUserTags() }, [])
@@ -40,21 +40,27 @@ export default function ScanFailed({ route }) {
           <Text style={styles.elementTitle}>Trip Information</Text>
         </View>
 
-        <View style={{ paddingLeft: 10, paddingRight: 10, flexDirection: 'row', marginTop: 10 }}>
+        <View style={styles.elementContainer}>
           <Text style={styles.elementTitle}>Operator: </Text>
           <Text style={styles.element}>{operatorData.operatorName}</Text>
         </View>
 
-        <View style={{ paddingLeft: 10, paddingRight: 10, flexDirection: 'row', marginTop: 5 }}>
+        <View style={styles.elementContainer}>
           <Text style={styles.elementTitle}>Date and time: </Text>
           <Text style={styles.element}>{date_and_hours}</Text>
         </View>
 
-        <View style={{ paddingLeft: 10, paddingRight: 10, flexDirection: 'row', marginTop: 5 }}>
+        <View style={styles.elementContainer}>
           <Text style={styles.elementTitle}>Tip left: </Text>
           <Text style={styles.element}>{userTags[0].numberOfTags}</Text>
         </View>
 
+        {(failureReason !== '') &&
+          <View style={styles.elementContainer}>
+            <Text style={styles.elementTitle}>Reason: </Text>
+            <Text style={styles.element}>{failureReason}</Text>
+          </View>
+        }
         <LightBlueButton label='Done' handleOnPress={onPressToHomeScreen} />
 
       </View>
@@ -77,8 +83,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   elementContainer: {
+    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
     flexDirection: 'row',
-    marginTop: 14,
+    marginTop: 10
   },
   elementTitle: {
     color: '#000',

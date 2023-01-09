@@ -33,6 +33,7 @@ export default function Camera({ route }) {
 
   const [sectorId, setSectorId] = useState()
   const [scannedQR, setScannedQR] = useState('')
+  const [failureReason, setFailureReason] = useState('')
 
   const filterToFindAllSector = () => {
     sectors.filter((_item) => {
@@ -45,7 +46,7 @@ export default function Camera({ route }) {
 
   const onScan = async (e) => {
 
-    const updateData = {
+    const updateTagsData = {
       id: userTags[0].id,
       numberOfTags: (Number(userTags[0].numberOfTags) - 1),
       expiryDate: userTags[0].expiryDate,
@@ -68,11 +69,14 @@ export default function Camera({ route }) {
 
     let currentTime = fullDate.toLocaleTimeString({ hour: 'numeric', hour12: false, minute: 'numeric' })
 
+    // If User has tags
+    // If User tag possessed by user is equal to the scanned data
+    // If the scanned data is set to All
     if (userTags[0].numberOfTags > 0 &&
-      (userTags[0].sectorID === e.data || userTags[0].sectorID === sectorId)) {
+      (userTags[0].sectorID === e.data && e.data === sectorId)) {
 
-      await API.graphql({ query: mutations.updateUserTags, variables: { input: updateData } })
-        .then(async (response) => {
+      await API.graphql({ query: mutations.updateUserTags, variables: { input: updateTagsData } })
+        .then(async () => {
 
           const userScanHistoryDataSuccess = {
             dateScanned: String(currentDate),
@@ -82,7 +86,7 @@ export default function Camera({ route }) {
             numberOfTagsDebited: 1,
           }
 
-          await API.graphql({
+          API.graphql({
             query: mutations.updateUserSettings,
             variables: { input: updateUserSettingsData }
           })
@@ -116,8 +120,16 @@ export default function Camera({ route }) {
         variables: { input: userScanHistoryDataFailed }
       })
 
+      if (userTags[0].numberOfTags === 0) {
+        setFailureReason('Inssuficient funds')
+        console.log(failureReason)
+      }
+      else if (userTags[0].numberOfTags > 0 && e.data !== sectorId) {
+        setFailureReason('Invalid ID Scanned')
+        console.log(failureReason)
+      }
       setScannedQR('failed')
-      navigation.navigate('ScanFailed', { operatorData })
+      navigation.navigate('ScanFailed', { operatorData, failureReason })
     }
   }
 
