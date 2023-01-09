@@ -12,10 +12,12 @@ import axios from 'axios'
 
 import { API } from 'aws-amplify'
 import * as queries from '../graphql/queries'
+import * as mutations from '../graphql/mutations'
 
 import { GOOGLE_MAPS_KEY, WEATHER_API_KEY } from '../keys'
 
 import { UserContext } from './UserDataProvider'
+import { CreateContext } from './CreateProvider'
 
 
 export const UserPreferencesContext = createContext()
@@ -28,6 +30,7 @@ export const UserPreferencesDataProvider = ({ children }) => {
     Geocoder.init(GOOGLE_MAPS_KEY)
 
     const { firstSigningIn } = useContext(UserContext)
+    const { createData } = useContext(CreateContext)
 
     const [loader, setLoader] = useState(false)
 
@@ -95,17 +98,16 @@ export const UserPreferencesDataProvider = ({ children }) => {
     }
 
     const fetchUserSettings = async () => {
-        try {
-            setLoader(true)
-            const userSettingsResults = await API.graphql({ query: queries.listUserSettingss })
-            setUserSettings(userSettingsResults.data.listUserSettingss.items[0])
-
-            setLoader(false)
-        }
-        catch (error) {
-            setLoader(false)
-            console.log('user settings: ', error)
-        }
+        setLoader(true)
+        await API.graphql({ query: queries.listUserSettingss })
+            .then((response) => {
+                setUserSettings(response.data.listUserSettingss.items[0])
+                setLoader(false)
+            })
+            .catch((error) => {
+                setLoader(false)
+                console.log('user settings: ', error)
+            })
     }
 
     const fetchUserTags = async () => {
@@ -117,50 +119,68 @@ export const UserPreferencesDataProvider = ({ children }) => {
             hour: 'numeric', hour12: false, minute: 'numeric'
         })
 
-        try {
-            setLoader(true)
-            const userTagsResults = await API.graphql({ query: queries.listUserTagss })
-            setUserTags(userTagsResults.data.listUserTagss.items)
-            setLoader(false)
-        }
-        catch (error) {
-            setLoader(false)
-            console.log('user tags', error)
-        }
+        setLoader(true)
+        await API.graphql({ query: queries.listUserTagss })
+            .then((response) => {
+                setUserTags(response?.data?.listUserTagss?.items)
+
+                const today = new Date()
+                const d = new Date()
+                d.setHours(Number(userTags[0].expiryTime.slice(0, 2)))
+                d.setMinutes(Number(userTags[0].expiryTime.slice(3, 5)))
+                d.setSeconds(Number(userTags[0].expiryTime.slice(6, 8)))
+                d.setFullYear(userTags[0].expiryDate.slice(0, 4), (Number(userTags[0].expiryDate.slice(5, 7)) - 1), userTags[0].expiryDate.slice(8, 10))
+
+                const data = {
+                    id: response?.data?.listUserTagss.id,
+                    numberOfTags: 0,
+                    expiryDate: '',
+                    expiryTime: '',
+                    operatorID: userTags[0].operatorID,
+                    sectorID: '',
+                }
+
+                if (d <= today) {
+                    createData(mutations.updateUserTags, data)
+                }
+                setLoader(false)
+            })
+            .catch((error) => {
+                setLoader(false)
+                console.log('user tags', error)
+            })
     }
 
     const fetchDefaultOperator = async (operatorData) => {
-        try {
-            setLoader(true)
-            const userTagsResults = await API.graphql({ query: queries.listUserDefaultOperators })
-            setDefaultOperator(userTagsResults.data.listUserDefaultOperators.items[0])
-            setLoader(false)
-
-            if ((operatorData?.operatorID === defaultOperator?.operatorID) && operatorData !== undefined) {
-                // Hide the splash screen when the user signs in automatically.
-                if (firstSigningIn === true) {
-                    navigation.dispatch(StackActions.replace('HomeBottomNav', { operatorData }))
+        setLoader(true)
+        await API.graphql({ query: queries.listUserDefaultOperators })
+            .then((response) => {
+                setDefaultOperator(response?.data?.listUserDefaultOperators?.items[0])
+                setLoader(false)
+                if ((operatorData?.operatorID === defaultOperator?.operatorID) && operatorData !== undefined) {
+                    // Hide the splash screen when the user signs in automatically.
+                    if (firstSigningIn === true) {
+                        navigation.dispatch(StackActions.replace('HomeBottomNav', { operatorData }))
+                    }
                 }
-            }
-        }
-        catch (error) {
-            setLoader(false)
-            console.log('user tags: ', error)
-        }
+            })
+            .catch((error) => {
+                setLoader(false)
+                console.log('user tags: ', error)
+            })
     }
 
     const fetchUserScanHistory = async () => {
-        try {
-            setLoader(true)
-            const userScanHistoryResults = await API.graphql({ query: queries.listUserScanHistorys })
-            setUserScanHistory(userScanHistoryResults?.data?.listUserScanHistorys?.items)
-            setLoader(false)
-
-        }
-        catch (error) {
-            setLoader(false)
-            console.log('user tags: ', error)
-        }
+        setLoader(true)
+        await API.graphql({ query: queries.listUserScanHistorys })
+            .then((response) => {
+                setUserScanHistory(response?.data?.listUserScanHistorys?.items)
+                setLoader(false)
+            })
+            .catch((error) => {
+                setLoader(false)
+                console.log('user tags: ', error)
+            })
     }
 
     const fetchFavoriteRoutes = async () => {

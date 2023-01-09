@@ -8,19 +8,27 @@ import SplashScreen from 'react-native-splash-screen'
 import { Home, Camera, Profile } from '../screens'
 
 import { UserContext } from '../contexts/UserDataProvider'
+import { UserPreferencesContext } from '../contexts/UserPreferencesDataProvider'
 
 
 const Tab = createBottomTabNavigator()
 
 export default function HomeBottomNav({ route }) {
 
-    useEffect(() => { SplashScreen.hide() }, [])
+    const { fetchUserTags } = useContext(UserPreferencesContext)
+
+    useEffect(() => {
+        SplashScreen.hide()
+        fetchUserTags()
+    }, [])
 
     //Receive data from OperatorsList component.
     const { operatorData } = route.params
     const { setFirstSigningIn } = useContext(UserContext)
 
-    useEffect(() => { setFirstSigningIn(false) })
+    useEffect(() => {
+        setFirstSigningIn(false)
+    })
 
     return (
         <Tab.Navigator

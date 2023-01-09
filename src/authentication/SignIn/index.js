@@ -29,7 +29,8 @@ export default function SignIn() {
     setRefreshUserTags,
     setRefreshUserSettings,
     setRefreshDefaultOperator,
-    setRefreshFavoriteRoutes
+    setRefreshFavoriteRoutes,
+    setRefreshUserScanHistory,
   } = useContext(UserPreferencesContext)
   const {
     setRefreshOperators,
@@ -49,17 +50,29 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
 
   const fetchCurrentUser = async () => {
-    try {
-      // If the user is already signed in navigate to the default scrren
-      await Auth.currentAuthenticatedUser()
-      setFirstSigningIn(true)
-      navigation.dispatch(StackActions.replace('DefaultScreen'))
-    } catch (err) {
-      // this means there is no current authenticated user
-      console.log('error signing in', err)
-      setErrorAutomaticSignin(true)
-      SplashScreen.hide()
-    }
+    // If the user is already signed in navigate to the default scrren
+    await Auth.currentAuthenticatedUser()
+      .then(() => {
+        setFirstSigningIn(true)
+
+        setRefreshUser(true)
+
+        setRefreshOperators(true)
+        setRefreshSectors(true)
+        setRefreshUserScanHistory(true)
+        setRefreshUserSettings(true)
+        setRefreshWeatherData(true)
+        setRefreshUserTags(true)
+        setRefreshDefaultOperator(true)
+        setRefreshFavoriteRoutes(true)
+        navigation.dispatch(StackActions.replace('DefaultScreen'))
+      })
+      .catch((err) => {
+        // this means there is no current authenticated user
+        console.log('error signing in', err)
+        setErrorAutomaticSignin(true)
+        SplashScreen.hide()
+      })
   }
 
   useEffect(() => {
@@ -81,7 +94,7 @@ export default function SignIn() {
 
         setRefreshOperators(true)
         setRefreshSectors(true)
-
+        setRefreshUserScanHistory(true)
         setRefreshUserSettings(true)
         setRefreshWeatherData(true)
         setRefreshUserTags(true)

@@ -25,9 +25,12 @@ export default function OperatorsList({ ...props }) {
     }
     const navigation = useNavigation()
     const {
-        defaultOperator, setRefreshWeatherData,
-        defaultOperatorID, setRefreshDefaultOperator,
-        fetchDefaultOperator } = useContext(UserPreferencesContext)
+        defaultOperator,
+        setRefreshWeatherData,
+        defaultOperatorID,
+        setRefreshDefaultOperator,
+        fetchDefaultOperator
+    } = useContext(UserPreferencesContext)
     const { firstSigningIn } = useContext(UserContext)
 
     const [operatorName, setOperatorName] = useState('')

@@ -42,7 +42,10 @@ export default function Camera({ route }) {
       }
     })
   }
-  useEffect(() => { filterToFindAllSector() })
+  useEffect(() => {
+    filterToFindAllSector()
+    fetchUserTags()
+  })
 
   const onScan = async (e) => {
 

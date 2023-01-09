@@ -54,7 +54,7 @@ export default function AddCredit({ route }) {
 
   // Manage expiry date and time
   const dt = dayjs()
-  let expiryDate = dt.add(parseInt(durationToExpiryInDays), "day").format("DD-MM-YY")
+  let expiryDate = dt.add(parseInt(durationToExpiryInDays), "day").format("YYYY-MM-DD")
   let fullDate = new Date()
   const expiryTime = fullDate.toLocaleTimeString({ hour: 'numeric', hour12: false, minute: 'numeric' })
 
