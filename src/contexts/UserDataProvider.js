@@ -11,6 +11,7 @@ export const UserDataProvider = ({ children }) => {
     const [currentFamilyName, setCurrentFamilyName] = useState('')
     const [currentEmail, setCurrentEmail] = useState('')
     const [currentUserSub, setCurrentUserSub] = useState('')
+    const [isEmailVerified, setIsEmailVerified] = useState('')
     const [currentUserProvince, setCurrentUserProvince] = useState('')
     const [currentUserCity, setCurrentUserCity] = useState('')
     const [error, setError] = useState()
@@ -29,11 +30,12 @@ export const UserDataProvider = ({ children }) => {
                 setCurrentFamilyName(user.attributes.family_name)
                 setCurrentEmail(user.attributes.email)
                 setCurrentUserSub(user.attributes.sub)
+                setIsEmailVerified(user.attributes.email_verified)
 
                 // Convert data from object to array to access custom attributes  
-                let result = Object.keys(user.attributes).map((key) => [key, user.attributes[key]])
-                setCurrentUserProvince(result[5][1])
-                setCurrentUserCity(result[6][1])
+                // let result = Object.keys(user.attributes).map((key) => [key, user.attributes[key]])
+                // setCurrentUserProvince(result[5][1])
+                // setCurrentUserCity(result[6][1])
             }).catch(err => {
                 setError(401)
             })
@@ -51,6 +53,7 @@ export const UserDataProvider = ({ children }) => {
 
     return (
         <UserContext.Provider value={{
+            fetchUserInfo,
             currentUsername,
             currentName,
             currentFamilyName,
@@ -59,6 +62,8 @@ export const UserDataProvider = ({ children }) => {
             currentUserProvince,
             currentUserCity,
             error,
+            isEmailVerified,
+            setIsEmailVerified,
             firstSigningIn,
             setFirstSigningIn,
             setRefreshUser,

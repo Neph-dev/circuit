@@ -99,6 +99,8 @@ export const createSector = /* GraphQL */ `
       routes {
         items {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -134,6 +136,8 @@ export const updateSector = /* GraphQL */ `
       routes {
         items {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -169,6 +173,8 @@ export const deleteSector = /* GraphQL */ `
       routes {
         items {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -188,6 +194,8 @@ export const createRoute = /* GraphQL */ `
   ) {
     createRoute(input: $input, condition: $condition) {
       id
+      routeName
+      lineNumber
       sectorID
       sectorName
       sector {
@@ -233,6 +241,8 @@ export const updateRoute = /* GraphQL */ `
   ) {
     updateRoute(input: $input, condition: $condition) {
       id
+      routeName
+      lineNumber
       sectorID
       sectorName
       sector {
@@ -278,6 +288,8 @@ export const deleteRoute = /* GraphQL */ `
   ) {
     deleteRoute(input: $input, condition: $condition) {
       id
+      routeName
+      lineNumber
       sectorID
       sectorName
       sector {
@@ -330,6 +342,8 @@ export const createRouteCheckPoint = /* GraphQL */ `
       routeID
       route {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -349,8 +363,9 @@ export const createRouteCheckPoint = /* GraphQL */ `
         items {
           id
           checkPointDepartureTime
-          checkPointBusNumber
           checkPointCount
+          checkPointNumber
+          nextCheckPointDetailsID
           routeCheckPointID
           createdAt
           updatedAt
@@ -376,6 +391,8 @@ export const updateRouteCheckPoint = /* GraphQL */ `
       routeID
       route {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -395,8 +412,9 @@ export const updateRouteCheckPoint = /* GraphQL */ `
         items {
           id
           checkPointDepartureTime
-          checkPointBusNumber
           checkPointCount
+          checkPointNumber
+          nextCheckPointDetailsID
           routeCheckPointID
           createdAt
           updatedAt
@@ -422,6 +440,8 @@ export const deleteRouteCheckPoint = /* GraphQL */ `
       routeID
       route {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -441,8 +461,9 @@ export const deleteRouteCheckPoint = /* GraphQL */ `
         items {
           id
           checkPointDepartureTime
-          checkPointBusNumber
           checkPointCount
+          checkPointNumber
+          nextCheckPointDetailsID
           routeCheckPointID
           createdAt
           updatedAt
@@ -462,8 +483,9 @@ export const createCheckPointDetails = /* GraphQL */ `
     createCheckPointDetails(input: $input, condition: $condition) {
       id
       checkPointDepartureTime
-      checkPointBusNumber
       checkPointCount
+      checkPointNumber
+      nextCheckPointDetailsID
       routeCheckPointID
       routeCheckPoint {
         id
@@ -474,6 +496,8 @@ export const createCheckPointDetails = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -498,8 +522,9 @@ export const updateCheckPointDetails = /* GraphQL */ `
     updateCheckPointDetails(input: $input, condition: $condition) {
       id
       checkPointDepartureTime
-      checkPointBusNumber
       checkPointCount
+      checkPointNumber
+      nextCheckPointDetailsID
       routeCheckPointID
       routeCheckPoint {
         id
@@ -510,6 +535,8 @@ export const updateCheckPointDetails = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -534,8 +561,9 @@ export const deleteCheckPointDetails = /* GraphQL */ `
     deleteCheckPointDetails(input: $input, condition: $condition) {
       id
       checkPointDepartureTime
-      checkPointBusNumber
       checkPointCount
+      checkPointNumber
+      nextCheckPointDetailsID
       routeCheckPointID
       routeCheckPoint {
         id
@@ -546,6 +574,8 @@ export const deleteCheckPointDetails = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -808,6 +838,51 @@ export const deleteUserScanHistory = /* GraphQL */ `
       idScanned
       status
       numberOfTagsDebited
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const createUserFavoriteRoute = /* GraphQL */ `
+  mutation CreateUserFavoriteRoute(
+    $input: CreateUserFavoriteRouteInput!
+    $condition: ModelUserFavoriteRouteConditionInput
+  ) {
+    createUserFavoriteRoute(input: $input, condition: $condition) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const updateUserFavoriteRoute = /* GraphQL */ `
+  mutation UpdateUserFavoriteRoute(
+    $input: UpdateUserFavoriteRouteInput!
+    $condition: ModelUserFavoriteRouteConditionInput
+  ) {
+    updateUserFavoriteRoute(input: $input, condition: $condition) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const deleteUserFavoriteRoute = /* GraphQL */ `
+  mutation DeleteUserFavoriteRoute(
+    $input: DeleteUserFavoriteRouteInput!
+    $condition: ModelUserFavoriteRouteConditionInput
+  ) {
+    deleteUserFavoriteRoute(input: $input, condition: $condition) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
       createdAt
       updatedAt
       owner

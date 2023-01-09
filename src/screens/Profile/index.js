@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
 import { useNavigation, StackActions } from '@react-navigation/native'
 
@@ -34,7 +34,9 @@ export default function Profile() {
         <View style={styles.profileScreenContainer}>
 
             {/* USER DETAILS */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+            <Pressable
+                onPress={onPressToAccount}
+                style={{ flexDirection: 'row', alignItems: 'center', }}>
                 <View style={styles.profilePicture}>
                     <Text style={{ fontSize: 22, color: '#000', margin: 'auto', textAlign: 'center', fontWeight: 'bold' }}>
                         {currentName.charAt(0)} {currentFamilyName.charAt(0)}
@@ -53,7 +55,7 @@ export default function Profile() {
                         </View>
                     </View>
                 </View>
-            </View>
+            </Pressable>
 
             <View style={styles.hr} />
 

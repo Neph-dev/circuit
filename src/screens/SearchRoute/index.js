@@ -3,14 +3,13 @@
 
 
 import React, { useState, useContext } from 'react'
-import { View, StyleSheet, Text, Pressable } from 'react-native'
+import { View, StyleSheet, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 
 import { GetDataContext } from '../../contexts/GetDataProvider'
 
 import RouteResultDetails from '../../components/RouteResultDetails'
 import SearchBar from '../../components/SearchBar'
-import DistanceCalculation from '../../components/DistanceCalculation'
 
 
 export default function SearchRoute() {
@@ -22,98 +21,68 @@ export default function SearchRoute() {
     let dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
         'Saturday']
     let currentDay = dayNames[new Date().getDay()] //Current day
-
-    // Coodinates of the departure point
-    const [latitude1, setLatitude1] = useState()
-    const [longitude1, setLongitude1] = useState()
-
-    const [searchBarLabel, setSearchBarLabel] = useState('')
-
-    // in an array, store the the distances calculated
-    const [distances, setDistances] = useState([])
-    const [arrivalDistances, setArrivalDistances] = useState([])
-    const [minDistance, setMinDistance] = useState()
-    const [getMinDistanceDep, setGetMinDistanceDep] = useState()
-    const [getMinDistanceArr, setGetMinDistanceArr] = useState()
-
-    // call function only if user search a route
-    const [searching, setSearching] = useState(false)
-
     const [selectedDay, setSelectedDay] = useState(currentDay)
 
-    let minDistanceDep
-    let minDistanceArr
+    const [departureLongitude, setDepartureLongitude] = useState()
+    const [departureLatitude, setDepartureLatitude] = useState()
+    const [departureAddress, setDepartureAddress] = useState()
 
-    // * Filter through the data accroding to the user search 
-    if (searching === true) {
-        routeCheckPoint.filter(async (ele) => {
-            if (searchBarLabel === 'Departure') {
-                // * From the departing coordinates, find the nearest Station
-                const distance = DistanceCalculation(latitude1, ele.checkPointLatitude, longitude1, ele.checkPointLongitude)
-                distances.push(distance)
+    const [arrivalLongitude, setArrivalLongitude] = useState()
+    const [arrivalLatitude, setArrivalLatitude] = useState()
+    const [arrivalAddress, setArrivalAddress] = useState()
 
-                setMinDistance(Math.min.apply(Math, distances))
+    const [departureStationResult, setDepartureStationResult] = useState([])
+    const [arrivalStationResult, setArrivalStationResult] = useState([])
 
-                // * Find the index of the minimum distance.
-                const findIndexEle = distances.findIndex((element) => {
-                    return element === Math.min.apply(Math, distances)
-                })
-                minDistanceDep = routeCheckPoint[findIndexEle]
+    const [minDepartureDistance, setMinDepartureDistance] = useState()
+    const [minArrivalDistance, setMinArrivalDistance] = useState()
 
-                setGetMinDistanceDep(routeCheckPoint[findIndexEle])
-                setSearching(false)
-            }
-            if (searchBarLabel === 'Arrival') {
-                const distance = DistanceCalculation(latitude1, ele.checkPointLatitude, longitude1, ele.checkPointLongitude)
-                arrivalDistances.push(distance)
+    const [loadingRoute, setLoadingRoute] = useState(false)
 
-                setMinDistance(Math.min.apply(Math, arrivalDistances))
+    const walkingSpeed = 5 //* Km/h
 
-                // * Find the index of the minimum distance.
-                const findIndex = arrivalDistances.findIndex((element) => {
-                    return element === Math.min.apply(Math, arrivalDistances)
-                })
-
-                minDistanceArr = routeCheckPoint[findIndex]
-                setGetMinDistanceArr(routeCheckPoint[findIndex])
-                setSearching(false)
-            }
-        })
+    const calculateTimeToReachStation = () => {
+        return Math.round((minDepartureDistance / walkingSpeed) * 60)
     }
 
-    const [depCheckPointCount, setDepCheckPointCount] = useState()
-    const [arrCheckPointCount, setArrCheckPointCount] = useState()
-    const [depFindRouteDetails, setDepFindRouteDetails] = useState()
-    const [arrFindRouteDetails, setArrFindRouteDetails] = useState()
+    const calculateTimeToReachDestination = () => {
+        return Math.round((minArrivalDistance / walkingSpeed) * 60)
+    }
 
-    const filterToDepFindRouteDetails = () => checkPointDetails.filter(element => {
-        if (element.routeCheckPointID?.includes(getMinDistanceDep?.id) && depCheckPointCount === undefined) {
-            setDepFindRouteDetails(element)
-            setDepCheckPointCount(element?.checkPointCount)
-        }
-    })
-    filterToDepFindRouteDetails()
-
-    const filterToArrFindRouteDetails = () => checkPointDetails.filter(element => {
-        if ((element.routeCheckPointID?.includes(getMinDistanceArr?.id)
-            && element?.checkPointCount > depCheckPointCount) && arrCheckPointCount === undefined) {
-            setArrFindRouteDetails(element)
-            setArrCheckPointCount(element?.checkPointCount)
-        }
-    })
-    filterToArrFindRouteDetails()
+    const checkDay = (_departureStation) => {
+        (_departureStation.routeCheckPoint.checkPointDay).filter((item) => {
+            if ((item === 'businessDays' &&
+                selectedDay !== 'Saturday' || selectedDay !== 'Sunday'
+            )) return true
+        })
+    }
 
     return (
         <View>
             <SearchBar
-                searchBarLabel={searchBarLabel}
-                setSearchBarLabel={setSearchBarLabel}
-                setDistances={setDistances}
-                setSearching={setSearching}
-                setLatitude1={setLatitude1}
-                setLongitude1={setLongitude1} />
+                setDepartureLongitude={setDepartureLongitude}
+                setDepartureLatitude={setDepartureLatitude}
+                setDepartureAddress={setDepartureAddress}
+                departureAddress={departureAddress}
+                setArrivalLongitude={setArrivalLongitude}
+                setArrivalLatitude={setArrivalLatitude}
+                arrivalAddress={arrivalAddress}
+                setArrivalAddress={setArrivalAddress}
 
-            {(depFindRouteDetails !== undefined && arrFindRouteDetails !== undefined) &&
+                departureStationResult={departureStationResult}
+                arrivalStationResult={arrivalStationResult}
+                routeCheckPoint={routeCheckPoint}
+                setDepartureStationResult={setDepartureStationResult}
+                setArrivalStationResult={setArrivalStationResult}
+
+                setMinDepartureDistance={setMinDepartureDistance}
+                setMinArrivalDistance={setMinArrivalDistance}
+                minArrivalDistance={minArrivalDistance}
+                setLoadingRoute={setLoadingRoute} />
+
+            {loadingRoute && <ActivityIndicator size="large" color="#1f2432" />}
+
+            {(departureStationResult.length !== 0 && arrivalStationResult.length !== 0) && (
                 <>
                     <View style={{
                         paddingTop: 10,
@@ -136,19 +105,45 @@ export default function SearchRoute() {
                                     fontSize: 13,
                                 }}>{dayName.slice(0, 3)}</Text>
                             </Pressable>
-                        ))
-                        }
+                        ))}
                     </View>
-                    <View style={styles.backgroundList}>
-                        <Pressable
-                            onPress={() => navigation.navigate('SelectedRoute')}
-                            style={styles.container}>
-                            <RouteResultDetails
-                                RouteResults={depFindRouteDetails}
-                                arrFindRouteDetails={arrFindRouteDetails} />
-                        </Pressable>
-                    </View>
-                </>}
+                    <ScrollView style={styles.backgroundList}>
+                        {departureStationResult.map((_departureStation) => (
+                            arrivalStationResult.map((_arrivalStation, index) => (
+                                ((_departureStation.routeCheckPoint.routeID === _arrivalStation.routeCheckPoint.routeID
+                                    && _departureStation.checkPointCount < _arrivalStation.checkPointCount
+                                    && _departureStation.checkPointNumber === _arrivalStation.checkPointNumber)) ? (
+                                    <Pressable
+                                        key={index}
+                                        onPress={() => navigation.navigate('SelectedRoute', { _departureStation, _arrivalStation })}
+                                        style={styles.container}>
+                                        <RouteResultDetails
+                                            calculateTimeToReachDestination={calculateTimeToReachDestination}
+                                            calculateTimeToReachStation={calculateTimeToReachStation}
+                                            _departureStation={_departureStation}
+                                            _arrivalStation={_arrivalStation} />
+                                    </Pressable>
+                                )
+                                    :
+                                    ((_departureStation.routeCheckPoint.routeID !== _arrivalStation.routeCheckPoint.routeID
+                                        && _departureStation.checkPointNumber === _arrivalStation.checkPointNumber))
+                                        ? (
+                                            <Pressable
+                                                key={index}
+                                                onPress={() => navigation.navigate('SelectedRoute', { _departureStation, _arrivalStation })}
+                                                style={styles.container}>
+                                                <RouteResultDetails
+                                                    calculateTimeToReachDestination={calculateTimeToReachDestination}
+                                                    calculateTimeToReachStation={calculateTimeToReachStation}
+                                                    _departureStation={_departureStation}
+                                                    _arrivalStation={_arrivalStation} />
+                                            </Pressable>)
+                                        : []
+                            ))
+                        ))}
+                    </ScrollView>
+                </>
+            )}
         </View>
     )
 }
@@ -159,7 +154,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         backgroundColor: '#fff',
         width: '100%',
-        alignItems: 'center',
+        // alignItems: 'center',
         height: 'auto',
         shadowColor: "#000",
         shadowOffset: {

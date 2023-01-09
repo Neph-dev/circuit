@@ -65,6 +65,8 @@ export const getSector = /* GraphQL */ `
       routes {
         items {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -110,6 +112,8 @@ export const getRoute = /* GraphQL */ `
   query GetRoute($id: ID!) {
     getRoute(id: $id) {
       id
+      routeName
+      lineNumber
       sectorID
       sectorName
       sector {
@@ -157,6 +161,8 @@ export const listRoutes = /* GraphQL */ `
     listRoutes(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -187,6 +193,8 @@ export const getRouteCheckPoint = /* GraphQL */ `
       routeID
       route {
         id
+        routeName
+        lineNumber
         sectorID
         sectorName
         sector {
@@ -206,8 +214,9 @@ export const getRouteCheckPoint = /* GraphQL */ `
         items {
           id
           checkPointDepartureTime
-          checkPointBusNumber
           checkPointCount
+          checkPointNumber
+          nextCheckPointDetailsID
           routeCheckPointID
           createdAt
           updatedAt
@@ -239,6 +248,8 @@ export const listRouteCheckPoints = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -259,8 +270,9 @@ export const getCheckPointDetails = /* GraphQL */ `
     getCheckPointDetails(id: $id) {
       id
       checkPointDepartureTime
-      checkPointBusNumber
       checkPointCount
+      checkPointNumber
+      nextCheckPointDetailsID
       routeCheckPointID
       routeCheckPoint {
         id
@@ -271,6 +283,8 @@ export const getCheckPointDetails = /* GraphQL */ `
         routeID
         route {
           id
+          routeName
+          lineNumber
           sectorID
           sectorName
           createdAt
@@ -301,8 +315,9 @@ export const listCheckPointDetailss = /* GraphQL */ `
       items {
         id
         checkPointDepartureTime
-        checkPointBusNumber
         checkPointCount
+        checkPointNumber
+        nextCheckPointDetailsID
         routeCheckPointID
         routeCheckPoint {
           id
@@ -494,6 +509,41 @@ export const listUserScanHistorys = /* GraphQL */ `
         idScanned
         status
         numberOfTagsDebited
+        createdAt
+        updatedAt
+        owner
+      }
+      nextToken
+    }
+  }
+`;
+export const getUserFavoriteRoute = /* GraphQL */ `
+  query GetUserFavoriteRoute($id: ID!) {
+    getUserFavoriteRoute(id: $id) {
+      id
+      departureRouteDetailsID
+      arrivalDetailsRouteID
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const listUserFavoriteRoutes = /* GraphQL */ `
+  query ListUserFavoriteRoutes(
+    $filter: ModelUserFavoriteRouteFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listUserFavoriteRoutes(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        departureRouteDetailsID
+        arrivalDetailsRouteID
         createdAt
         updatedAt
         owner

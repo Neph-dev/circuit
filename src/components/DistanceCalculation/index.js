@@ -20,10 +20,9 @@ export default function DistanceCalculation(lat1, lat2, lon1, lon2) {
     let c = 2 * Math.asin(Math.sqrt(a))
 
     // Radius of earth in kilometers. Use 3956
-    // for miles
-    let r = 6371
+    // for miles 6371
+    let r = 3956
 
     // calculate the result
     return (c * r)
-
 }

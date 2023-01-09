@@ -29,6 +29,7 @@ export default function SignIn() {
     setRefreshUserTags,
     setRefreshUserSettings,
     setRefreshDefaultOperator,
+    setRefreshFavoriteRoutes
   } = useContext(UserPreferencesContext)
   const {
     setRefreshOperators,
@@ -85,6 +86,7 @@ export default function SignIn() {
         setRefreshWeatherData(true)
         setRefreshUserTags(true)
         setRefreshDefaultOperator(true)
+        setRefreshFavoriteRoutes(true)
 
         navigation.dispatch(StackActions.replace('DefaultScreen'))
       })
